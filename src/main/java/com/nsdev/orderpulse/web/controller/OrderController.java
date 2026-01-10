@@ -3,6 +3,7 @@ package com.nsdev.orderpulse.web.controller;
 import com.nsdev.orderpulse.domain.model.Order;
 import com.nsdev.orderpulse.domain.service.OrderService;
 import com.nsdev.orderpulse.web.dto.OrderRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class OrderController {
      */
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public Order createOrder(@RequestBody OrderRequest request) {
+    public Order createOrder(@RequestBody @Valid OrderRequest request) {
         return orderService.createOrder(request);
     }
 }

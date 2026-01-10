@@ -1,0 +1,32 @@
+spring:
+  task:
+    scheduling:
+      shutdown:
+        await-termination: true
+        await-termination-period: 500ms
+  lifecycle:
+    timeout-per-shutdown-phase: 1s
+
+  cloud:
+    stream:
+      kafka:
+        binder:
+          required-acks: 1
+          min-partition-count: 1
+          configuration:
+            auto.offset.reset: earliest
+
+orderpulse:
+  outbox:
+    polling-interval-ms: 100
+    hospital-interval-ms: 1000
+    max-retries: 2
+
+logging:
+  level:
+    root: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN
+    org.apache.kafka.clients.NetworkClient: OFF
+    org.mongodb.driver: OFF
+    org.springframework.scheduling: OFF
