@@ -1,23 +1,47 @@
 server:
   port: 8081
+  servlet:
+    context-path: /order-pulse
 
 spring:
   application:
     name: orderpulse
+
   data:
     mongodb:
       uri: mongodb://admin:password@localhost:27017/orderpulse?authSource=admin
+
   cloud:
     stream:
-      kafka:
-        binder:
-          brokers: localhost:9092
-          auto-create-topics: true
       bindings:
         orderCreated-out-0:
           destination: orders.events.v1
           content-type: application/json
+
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+          required-acks: all
+          min-partition-count: 3
+          configuration:
+            request.timeout.ms: 2000
+            delivery.timeout.ms: 3000
+            retries: 0
+
+        bindings:
+          orderCreated-out-0:
+            producer:
+              sync: true # Blocking send for safety
+
+orderpulse:
+  outbox:
+    polling-interval-ms: 5000
+    hospital-interval-ms: 1800000 # 30 mins
+    max-retries: 5
+
 logging:
   level:
-    org.springframework.data.mongodb.core.MongoTemplate: INFO
-    org.springframework.cloud.stream: INFO
+    root: INFO
+    com.nsdev: DEBUG
+    org.springframework.cloud.stream.binder.kafka: ERROR
