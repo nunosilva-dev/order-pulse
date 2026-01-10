@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: orderpulse
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27017/orderpulse?authSource=admin
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+      bindings:
+        orderCreated-out-0:
+          destination: orders.events.v1
+          content-type: application/json
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: INFO
+    org.springframework.cloud.stream: INFO
