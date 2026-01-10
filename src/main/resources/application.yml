@@ -12,11 +12,23 @@ spring:
       uri: mongodb://admin:password@localhost:27017/orderpulse?authSource=admin
 
   cloud:
+    function:
+      definition: warehouseProcessor
+
     stream:
       bindings:
+        # --- PRODUCER ---
         orderCreated-out-0:
           destination: orders.events.v1
           content-type: application/json
+
+        # --- CONSUMER ---
+        warehouseProcessor-in-0:
+          destination: orders.events.v1
+          group: warehouse-group
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 1000
 
       kafka:
         binder:
@@ -32,12 +44,17 @@ spring:
         bindings:
           orderCreated-out-0:
             producer:
-              sync: true # Blocking send for safety
+              sync: true
+
+          warehouseProcessor-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: orders.events.v1.dlq
 
 orderpulse:
   outbox:
     polling-interval-ms: 5000
-    hospital-interval-ms: 1800000 # 30 mins
+    hospital-interval-ms: 1800000
     max-retries: 5
 
 logging:
