@@ -49,11 +49,19 @@ pill" messages that could block the processing queue.
 
 ```mermaid
 stateDiagram-v2
-[*] --> PENDING
-PENDING --> COMPLETED : Kafka ACK
-PENDING --> PENDING : Transient Fail (Retry)
-PENDING --> MANUAL_INTERVENTION : Max Retries / Timeout
-MANUAL_INTERVENTION --> PENDING : Operator Fix (DB Update)
+    direction LR
+    
+    state "PENDING" as P
+    state "COMPLETED" as C
+    state "MANUAL_INTERVENTION" as MI
+
+    [*] --> P
+    
+    P --> C : Kafka ACK
+    P --> P : Retry (Transient)
+    
+    P --> MI : Max Retries / Timeout
+    MI --> P : Operator Fix (DB Update)
 ```
 
 ---
